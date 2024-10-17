@@ -1,13 +1,55 @@
 ---
 title: "Project-1"
-author: "Haoran Shi"
+author: "Haoran Shi and Jingyao Zhang"
 date: "2024-10-17"
 output: pdf_document
+bibliography: references.bib
+csl: apa-with-abstract.csl
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Abstract
+```{r, include = FALSE}
+esg.data = read.csv("sp500_esg_data.csv")
+
+
+```
+
+# Abstract ## Tina
+
+#Introduction ## Tina
+
+# Data #Do Respective data
+
+# Analysis and Results
+*To see top 5% company that with lowest score, and to explore correlation between score and type of industry 
+Within 90th percentile companies, pie chart of percentage each industry in the 90th percentile 
+```{r plot1}
+##Tina
+
+```
+
+*To investigate 3 industries (information technology, healthcare, financial) distributed in which percentile, category into 4, 0-25, 25-50, 50-75, 75-100
+Barplot
+```{r plot 2}
+```
+
+*To count categorize companies into five risk levels, negligible, low, medium, high, severe 
+To see if s&p 500 companies intended to control their score under low or medium level 
+Histogram: categories by risk level, frequency of companies for each risk level
+See trend.
+```{r plot 3}
+```
+
+
+
+# Conclusion #Jenna
+
+# Contribution Statement
+
+# References ## Jenna
+@greenchoicenowWhatsScore
+@R
 
