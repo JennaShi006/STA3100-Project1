@@ -24,6 +24,7 @@ esg.data = read.csv("sp500_esg_data.csv")
 # Data #Do Respective data
 
 # Analysis and Results
+## cite R, RStudio here
 *To see top 5% company that with lowest score, and to explore correlation between score and type of industry 
 Within 90th percentile companies, pie chart of percentage each industry in the 90th percentile 
 ```{r plot1}
@@ -32,8 +33,50 @@ Within 90th percentile companies, pie chart of percentage each industry in the 9
 ```
 
 *To investigate 3 industries (information technology, healthcare, financial) distributed in which percentile, category into 4, 0-25, 25-50, 50-75, 75-100
-Barplot
+grouped Bar plot
 ```{r plot 2}
+library(ggplot2)
+
+#creates new column categorizing each entry into quartiles based on their percentile
+for (i in 1:nrow(esg.data)){
+    
+    if (25.0>=esg.data$percentile[i]){
+        esg.data$quartiles[i] = "Quartile 1"
+    } else if (50>=esg.data$percentile[i]){
+        esg.data$quartiles[i] = "Quartile 2"
+    } else if (75>=esg.data$percentile[i]){
+        esg.data$quartiles[i] = "Quartile 3"
+    } else{
+        esg.data$quartiles[i] = "Quartile 4"
+    }
+}
+#Creates a subset of esg.data with only the 3 selected sectors
+
+esg.data.industries= data.frame(subset(esg.data, GICS.Sector== "Information Technology"| esg.data$GICS.Sector == "Health Care" | esg.data$GICS.Sector == "Financials"))
+
+
+industries = c("Information Technology", "Health Care", "Financials")
+
+quartiles = c("Quartile 1","Quartile 2", "Quartile 3","Quartile 4")
+
+
+heights = vector("numeric",12)
+mod.index = 0
+for (i in 1:4){
+    for (j in 1:3){
+        heights[j+mod.index] = nrow(esg.data.industries[esg.data.industries$GICS.Sector == industries[j] & esg.data.industries$quartiles == quartiles[i],])
+        
+    }
+    mod.index = mod.index +3
+    
+}
+
+heights
+mod.data = data.frame(Heights = heights, Industries = c(industries, industries, industries, industries), Quartiles = rep(quartiles, each =3))
+mod.data
+                      
+ggplot(mod.data, aes(fill= Industries, y= Heights, x= Quartiles)) +
+geom_bar(stat = "identity", position = "dodge") 
 ```
 
 *To count categorize companies into five risk levels, negligible, low, medium, high, severe 
@@ -52,4 +95,6 @@ See trend.
 # References ## Jenna
 @greenchoicenowWhatsScore
 @R
+
+
 
