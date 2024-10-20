@@ -70,20 +70,33 @@ for (i in 1:4){
     mod.index = mod.index +3
     
 }
+# creates new data frame with only necessary data
+mod.data = data.frame(Quantity = heights, Industries = c(industries, industries, industries, industries), Quartiles = rep(quartiles, each =3))
 
-heights
-mod.data = data.frame(Heights = heights, Industries = c(industries, industries, industries, industries), Quartiles = rep(quartiles, each =3))
-mod.data
-                      
-ggplot(mod.data, aes(fill= Industries, y= Heights, x= Quartiles)) +
-geom_bar(stat = "identity", position = "dodge") 
+# creates grouped bar plot                      
+ggplot(mod.data, aes(fill= Industries, y= Quantity, x= Quartiles)) +
+geom_bar(stat = "identity", position = "dodge") + labs(title = "Quantity of Companies in Select Industries versus Quartile from ESG Score Percentile") + theme(plot.title = element_text(size = 11)) 
+
 ```
 
 *To count categorize companies into five risk levels, negligible, low, medium, high, severe 
 To see if s&p 500 companies intended to control their score under low or medium level 
 Histogram: categories by risk level, frequency of companies for each risk level
 See trend.
+
+
+Explore Correlation between governance scores and industry type
 ```{r plot 3}
+industries = c("Communication Services","Consumer Discretionary", "Consumer Staples", "Energy", "Financials", "Health Care", "Industrials", "Information Technology", "Materials", "Real Estate", "Utilities")
+
+gov.averages = vector("numeric", length(industries))
+
+for (i in 1:length(gov.averages)){
+    gov.averages[i] = mean(esg.data$governanceScore[which(esg.data$GICS.Sector == industries[i])])
+}
+
+barplot(height = gov.averages, xlab = "Industries", ylab = "Mean Governance Scores", main = "Mean Governance Scores versus Industry Sector", las = 2, col = colours()[c(3,16,29,46,67,76,91,106,121,136,151)])
+legend("topright", col= colours()[c(3,16,29,46,67,76,91,106,121,136,151)], legend = industries, cex = 0.5, pch = 16, ncol = 2)
 ```
 
 
