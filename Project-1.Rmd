@@ -9,6 +9,7 @@ csl: apa-with-abstract.csl
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(knitr)
@@ -16,11 +17,10 @@ library(knitr)
 
 ```{r, include = FALSE}
 esg.data = read.csv("sp500_esg_data.csv")
-
-
 ```
 
 # Abstract ## Tina
+
 
 #Introduction ## Tina
 
@@ -31,21 +31,22 @@ esg.data = read.csv("sp500_esg_data.csv")
 *To see top 5% company that with lowest score, and to explore correlation between score and type of industry 
 Within 90th percentile companies, pie chart of percentage each industry in the 90th percentile 
 ```{r plot1}
-```{r plot1}
 # Identify top 10% companies with lowest score
 top_10_percent_value <- quantile(data$totalEsg, probs=0.10)
 companies_with_lowest_score <- data |> filter(totalEsg <= top_10_percent_value)
 kable(companies_with_lowest_score, caption = "Top 10% Companies with the Lowest ESG Scores")
 
 # Create a pie chart to explore the distribution of industries in the 90th percentile
-sector <- companies_with_lowest_score |>
-  count("GICS.Sector") |>
-  
-ggplot(sector, aes(x = "", y = n, fill = "GICS Sector")) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar(theta = "y") +
-  labs(title = "Industry Distribution in the 90th Percentile of ESG Scores") +
-  theme_void()
+sector_counts <- companies_with_lowest_score %>%
+  group_by(GICS.Sector) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+ggplot(sector_counts, aes(x = "", y = count, fill = GICS.Sector)) +
+  geom_bar(stat = "identity") +
+  coord_polar("y", start = 0) +
+  theme_void() +
+  labs(title = "Industry Distribution in the 90th Percentile of ESG Scores")
 ```
 
 
