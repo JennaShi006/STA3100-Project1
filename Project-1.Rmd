@@ -8,32 +8,45 @@ csl: apa-with-abstract.csl
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE, tidy.opts = list(width.cutoff = 80), tidy = TRUE)
 library(ggplot2)
 library(dplyr)
-library(knitr)
 ```
 
 ```{r, include = FALSE}
 esg.data = read.csv("sp500_esg_data.csv")
+
 ```
 
-# Abstract ## Tina
+# Abstract 
+The dataset for this project is about the ESG (Environmental, Social, and Governance) scores of S&P 500 companies in 2023-2024. The project attempts to find the relationship between different industries and their ESG scores. The goal is to further explore the industries that focus on ESG index, compare the distribution of information technology, healthcare, and finance in ESG index, and explore the importance that different industries attach to governance scores. As a result, Real Estate, Information Technology, and Consumer Discretionary are the top three industries that focus on ESG index. The Information Technology industry is more conscious of its impact than the Financial and Health Care industries. Surprisingly, the Financial sector has a relatively higher governance score than all other sectors. 
+
+# Introduction 
+As society develops, the world is paying more and more attention to the performance and impact of companies in terms of environment, society, and governance. As leaders and models in various industries, the S&P 500 companies impact other companies worldwide. Their performance and management direction play a leading role. Different sectors may pay distinct attention to the ESG index. This project mainly explores the ESG scores of various industries and their emphasis on ESG impact.
+
+Analyzing the industries with the top 10% index can give people an overview of the industry distribution of S&P500 companies. In addition, Information Technology, Healthcare, and Finance are three critical fields that greatly impact people's quality of life and social environment. Analyzing the percentile distribution of companies in these three fields helps us further understand these three industries' current status and trends. Furthermore, since supervision is essential for each sector, looking at the average governance score of each industry can provide a direction for further improvement of society.
 
 
-#Introduction ## Tina
+# Data
+The data set selected focuses on the ESG (Environmental, Social, and Governance) scores of companies listed in the S&P 500 index. The environmental score evaluates a company’s impact on the environment, considering factors such as carbon emissions, energy consumption, and waste management. The social score assesses the company’s relationships with its employees, suppliers, customers, and the communities in which it operates. The governance score measures corporate governance practices, including executive compensation, audits, internal controls, and shareholder rights. Combined, the ESG score represents the overall risk or impact a company has across these three areas, with a lower ESG score indicating a more positive or less harmful impact on society. Companies are ranked relative to each other based on their ESG scores, with higher percentiles assigned to companies that achieve higher ESG scores (@kaggleStocksData).
 
-# Data #Do Respective data
+Consider exploring **[this link](https://www.sustainalytics.com/esg-rating/amazon-com-inc/1007896995)** which gives some insight to how the ESG score translates to a company's ranking and thus their percentile by using Amazon.com,Inc. as an example (@sustainalyticsCompanyRisk).
+
+
+A key limitation of this data set lies in the fact that ESG scores are self-reported, meaning their accuracy depends on the transparency and good faith of the reporting companies. Additionally, the factors and weightings used to calculate ESG scores vary by sector, with each sector placing emphasis on different aspects and assigning varying levels of importance to specific factors. This variation complicates the comparability of ESG scores across sectors, raising questions about the fairness and consistency of such comparison (@greenchoicenowWhatsScore).
 
 # Analysis and Results
-## cite R, RStudio here
-*To see top 5% company that with lowest score, and to explore correlation between score and type of industry 
-Within 90th percentile companies, pie chart of percentage each industry in the 90th percentile 
+Using @R and @RStudio, and the packages @ggplot2 and @dplyr, the following analysis on the data set @kaggleStocksData has been conducted:
+
+### Industry Distribution of the 10% Companies with the Lowest ESG Scores
+This section aims to investigate the 10% of companies with the lowest ESG total scores and their industry distribution to explore the correlation between score and type of industry.
+
 ```{r plot1}
+#| label: plot1
+
 # Identify top 10% companies with lowest score
-top_10_percent_value <- quantile(data$totalEsg, probs=0.10)
-companies_with_lowest_score <- data |> filter(totalEsg <= top_10_percent_value)
+top_10_percent_value <- quantile(esg.data$totalEsg, probs=0.10)
+companies_with_lowest_score <- esg.data |> filter(totalEsg <= top_10_percent_value)
 
 # Create a pie chart to explore the distribution of industries in the 90th percentile
 sector_counts <- companies_with_lowest_score |>
@@ -46,15 +59,20 @@ ggplot(sector_counts, aes(x = "", y = count, fill = GICS.Sector)) +
   coord_polar("y", start = 0) +
   theme_void() +
   labs(title = "Industry Distribution in the 90th Percentile of ESG Scores")
+
+print(sector_counts)
 ```
 
+The pie chart shows that among the lowest 10% of the S&P 500 ESG index, the real estate industry has the most companies, 14. The information technology and Consumer Discretionary industries are second and third. This reflects that society has attached great importance to the real estate industry's concept of green environmental protection in recent years (@deloitteValueDriver). 
 
-```
 
-*To investigate 3 industries (information technology, healthcare, financial) distributed in which percentile, category into 4, 0-25, 25-50, 50-75, 75-100
-grouped Bar plot
-```{r plot 2}
-library(ggplot2)
+
+
+### Distribution of ESG Score Percentiles within Select Industries
+
+This next section seeks to investigate the percentile distribution the of ESG scores of companies within in 3 sectors: Information Technology, Health Care, and Financials. These 3 sectors were chosen because of their similarity in size, with Information Technology having `r nrow(esg.data[esg.data$GICS.Sector =="Information Technology",])` companies, Health Care having `r nrow(esg.data[esg.data$GICS.Sector =="Health Care",])` companies, and Financials having a slightly greater number of `r nrow(esg.data[esg.data$GICS.Sector =="Financials",])`. Additionally, @ggplot2 was used to construct a grouped bar plot.
+```{r plot 2, message = FALSE, warning = FALSE}
+#| label: plot2
 
 #creates new column categorizing each entry into quartiles based on their percentile
 for (i in 1:nrow(esg.data)){
@@ -90,22 +108,23 @@ for (i in 1:4){
     
 }
 # creates new data frame with only necessary data
-mod.data = data.frame(Quantity = heights, Industries = c(industries, industries, industries, industries), Quartiles = rep(quartiles, each =3))
+mod.data = data.frame(Quantity = heights, Sectors = c(industries, industries, industries, industries), Quartiles = rep(quartiles, each =3))
 
 # creates grouped bar plot                      
-ggplot(mod.data, aes(fill= Industries, y= Quantity, x= Quartiles)) +
+ggplot(mod.data, aes(fill= Sectors, y= Quantity, x= Quartiles)) +
 geom_bar(stat = "identity", position = "dodge") + labs(title = "Quantity of Companies in Select Industries versus Quartile from ESG Score Percentile") + theme(plot.title = element_text(size = 11)) 
 
 ```
 
-*To count categorize companies into five risk levels, negligible, low, medium, high, severe 
-To see if s&p 500 companies intended to control their score under low or medium level 
-Histogram: categories by risk level, frequency of companies for each risk level
-See trend.
+Within the `r industries[3]` and `r industries[2]` sectors, the distribution is such that there is a maximum reached in Quartile 2, meaning that more companies had ESG scores that were higher than 25% of all companies and lower than 50% of all companies. This differs greatly from the `r industries[1]` sector, where the vast majority of companies had a percentile within the first quartile, meaning that these companies had the lowest ESG scores out of all the companies compared. This could suggest that companies within the `r industries[1]` sector are more conscious of their impact on society. This could also be a reflection of the fact that these companies, such as Amazon and Apple, get more press coverage, and are thus under greater public scrutiny than companies from other sectors. 
 
 
-Explore Correlation between governance scores and industry type
+### Mean Governance Score Disparity by Sector
+
+In this section, the relationship between governance scores and sector is discussed. 
 ```{r plot 3}
+#| label: plot3
+
 industries = c("Communication Services","Consumer Discretionary", "Consumer Staples", "Energy", "Financials", "Health Care", "Industrials", "Information Technology", "Materials", "Real Estate", "Utilities")
 
 gov.averages = vector("numeric", length(industries))
@@ -114,19 +133,28 @@ for (i in 1:length(gov.averages)){
     gov.averages[i] = mean(esg.data$governanceScore[which(esg.data$GICS.Sector == industries[i])])
 }
 
-barplot(height = gov.averages, xlab = "Industries", ylab = "Mean Governance Scores", main = "Mean Governance Scores versus Industry Sector", las = 2, col = colours()[c(3,16,29,46,67,76,91,106,121,136,151)])
+barplot(height = gov.averages, ylim = c(0,10), xlab = "Industries", ylab = "Mean Governance Scores", main = "Mean Governance Scores versus Industry Sector", las = 2, col = colours()[c(3,16,29,46,67,76,91,106,121,136,151)])
 legend("topright", col= colours()[c(3,16,29,46,67,76,91,106,121,136,151)], legend = industries, cex = 0.5, pch = 16, ncol = 2)
+
 ```
+This graph compares the mean governance scores for all sectors included in the @kaggleStocksData data set. The average mean governance score across all sectors is `r mean(gov.averages)`.
+It is noted that while most industries had similar governance scores, the `r industries[5]` sector had a significantly greater mean governance score of `r gov.averages[5]`. This suggests that companies within the `r industries[5]` sector had more concerning corporate governance practices. Additionally, it is worth mentioning that the mean governance score of the `r industries[8]` sector, which is `r gov.averages[8]`, is one of the lower scores, which aligns with how most companies in this sector had lower overall ESG scores as discussed in prior section.
 
 
 
-# Conclusion #Jenna
+# Conclusion
+
+This project sought to explore the relationships between the different sectors of companies within the S&P 500 and their ESG Scores. Real Estate is the industry that most focuses on the ESG score as shown in the first analysis section. Since Real Estate is usually an important part of business, society is trying to make it more sustainable currently. The Information Technology sector is more concerned about the ESG impact than Finance and Health Care sectors. Financial sector has the highest average governance score within all sectors, which indicates that there is an improvement room for the Finance field. 
 
 # Contribution Statement
+### Haoran Shi:
+Completed Data, the 2nd and 3rd plots and their analyses, all references and bibliography, and collaborated on Conclusion.
 
-# References ## Jenna
-@greenchoicenowWhatsScore
-@R
+### Jingyao Zhang:
+Completed Abstract, Introduction, 1st plot and analysis, and collaborated on Conclusion.
+
+# References
+
 
 
 
