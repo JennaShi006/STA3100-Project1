@@ -9,11 +9,12 @@ csl: apa-with-abstract.csl
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
 ```
 
 ```{r, include = FALSE}
 esg.data = read.csv("sp500_esg_data.csv")
-
 
 ```
 
@@ -30,24 +31,24 @@ Consider exploring **[this link](https://www.sustainalytics.com/esg-rating/amazo
 A key limitation of this data set lies in the fact that ESG scores are self-reported, meaning their accuracy depends on the transparency and good faith of the reporting companies. Additionally, the factors and weightings used to calculate ESG scores vary by sector, with each sector placing emphasis on different aspects and assigning varying levels of importance to specific factors. This variation complicates the comparability of ESG scores across sectors, raising questions about the fairness and consistency of such comparison (@greenchoicenowWhatsScore).
 
 # Analysis and Results
-Using @R and @RStudio, the following analysis on the dataset @kaggleStocksData has been conducted:
+Using @R and @RStudio, and the packages @ggplot2 and @dplyr, the following analysis on the data set @kaggleStocksData has been conducted:
 
 
 To see top 5% company that with lowest score, and ts.
 o explore correlation between score and type of industry 
 Within 90th percentile companies, pie chart of percentage each industry in the 90th percentile 
 ```{r plot1}
-##Tina
+# Identify top 10% companies with lowest score
+
+
+
 
 ```
 
-To investigate 3 industries (information technology, healthcare, financial) distributed in which percentile, category into 4, 0-25, 25-50, 50-75, 75-100
-grouped Bar plot
+### Distribution of ESG Score Percentiles within Select Industries
 
 This next section seeks to investigate the percentile distribution the of ESG scores of companies within in 3 sectors: Information Technology, Health Care, and Financials. These 3 sectors were chosen because of their similarity in size, with Information Technology having `r nrow(esg.data[esg.data$GICS.Sector =="Information Technology",])` companies, Health Care having `r nrow(esg.data[esg.data$GICS.Sector =="Health Care",])` companies, and Financials having a slightly greater number of `r nrow(esg.data[esg.data$GICS.Sector =="Financials",])`. Additionally, @ggplot2 was used to construct a grouped bar plot.
 ```{r plot 2}
-library(ggplot2)
-
 #creates new column categorizing each entry into quartiles based on their percentile
 for (i in 1:nrow(esg.data)){
     
@@ -89,11 +90,13 @@ ggplot(mod.data, aes(fill= Sectors, y= Quantity, x= Quartiles)) +
 geom_bar(stat = "identity", position = "dodge") + labs(title = "Quantity of Companies in Select Industries versus Quartile from ESG Score Percentile") + theme(plot.title = element_text(size = 11)) 
 
 ```
+
 Within the `r industries[3]` and `r industries[2]` sectors, the distribution is such that there is a maximum reached in Quartile 2, meaning that more companies had ESG scores that were higher than 25% of all companies and lower than 50% of all companies. This differs greatly from the `r industries[1]` sector, where the vast majority of companies had a percentile within the first quartile, meaning that these companies had the lowest ESG scores out of all the companies compared. This could suggest that companies within the `r industries[1]` sector are more conscious of their impact on society. This could also be a reflection of the fact that these companies, such as Amazon and Apple, get more press coverage, and are thus under greater public scrutiny than companies from other sectors. 
 
 
+### Mean Governance Score Disparity by Sector
 
-Furthermore, the relationship between governance scores and sector is discussed. 
+In this section, the relationship between governance scores and sector is discussed. 
 ```{r plot 3}
 industries = c("Communication Services","Consumer Discretionary", "Consumer Staples", "Energy", "Financials", "Health Care", "Industrials", "Information Technology", "Materials", "Real Estate", "Utilities")
 
@@ -108,7 +111,7 @@ legend("topright", col= colours()[c(3,16,29,46,67,76,91,106,121,136,151)], legen
 
 ```
 This graph compares the mean governance scores for all sectors included in the @kaggleStocksData data set. The average mean governance score across all sectors is `r mean(gov.averages)`.
-It is noted that while most industries had similar governance scores, the `r industries[5]` sector had a significantly greater mean governance score of `r gov.averages[5]`. This suggests that companies within the utilities sector had more concerning corporate governance practices. 
+It is noted that while most industries had similar governance scores, the `r industries[5]` sector had a significantly greater mean governance score of `r gov.averages[5]`. This suggests that companies within the `r industries[5]` sector had more concerning corporate governance practices. Additionally, it is worth mentioning that the mean governance score of the `r industries[8]` sector, which is `r gov.averages[8]`, is one of the lower scores, which aligns with how most companies in this sector had lower overall ESG scores as discussed in prior section.
 
 
 
